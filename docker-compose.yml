@@ -1,0 +1,21 @@
+version: '3.8'
+
+name: ${APP_NAME}
+
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_DB_ROOT_PASS}
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+      MYSQL_USER: ${MYSQL_DB_USER_NAME}
+      MYSQL_PASSWORD: ${MYSQL_DB_USER_PASS}
+    ports:
+      - ${MYSQL_DB_PORTS}
+    networks:
+      - app_net
+
+networks:
+  app_net:
+    name: app_net
