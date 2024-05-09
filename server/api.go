@@ -1,7 +1,9 @@
 package server
 
 import (
+	"github.com/go-playground/validator/v10"
 	"net/http"
+	"simple-api/auth"
 	"simple-api/handler"
 )
 
@@ -29,12 +31,18 @@ func (s *ApiServer) Listen() error {
 }
 
 func (s *ApiServer) setupRouter() {
-	dh := handler.NewDefaultHandler(s.Db, s.Validate)
+	JWTAuth := auth.NewJWTAuth()
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	dh := handler.NewDefaultHandler(s.Db, validate, JWTAuth)
+
+	authHandler := handler.NewAuthHandler(dh)
+
+	s.router.HandleFunc("POST /login", handler.AsJSONContent(handler.MakeHandleFunc(authHandler.LoginHandler)))
 
 	productHandler := handler.NewProductHandler(dh)
 
 	s.router.HandleFunc("POST /product", handler.AsJSONContent(handler.MakeHandleFunc(productHandler.CreateProductHandler)))
-	s.router.HandleFunc("GET /product/{id}", handler.AsJSONContent(handler.MakeHandleFunc(productHandler.GetProductByIDHandler)))
+	s.router.HandleFunc("GET /product/{id}", handler.AsProtected(handler.AsJSONContent(handler.MakeHandleFunc(productHandler.GetProductByIDHandler)), s.Db))
 
 	clientHandler := handler.NewClientHandler(dh)
 

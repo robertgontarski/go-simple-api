@@ -4,7 +4,7 @@ export
 lint:
 	@golangci-lint run ./...
 
-build: lint
+build:
 	@go build -o bin/app
 
 run: build

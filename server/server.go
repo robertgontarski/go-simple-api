@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/go-playground/validator/v10"
 	"simple-api/storage"
 )
 
@@ -10,15 +9,13 @@ type Server interface {
 }
 
 type ConfigServer struct {
-	Addr     string
-	Db       storage.Storage
-	Validate *validator.Validate
+	Addr string
+	Db   storage.Storage
 }
 
-func NewConfigServer(addr string, store storage.Storage, validate *validator.Validate) *ConfigServer {
+func NewConfigServer(addr string, store storage.Storage) *ConfigServer {
 	return &ConfigServer{
-		Addr:     addr,
-		Db:       store,
-		Validate: validate,
+		Addr: addr,
+		Db:   store,
 	}
 }

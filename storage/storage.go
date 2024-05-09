@@ -7,4 +7,5 @@ type Storage interface {
 	GetProductByID(int) (*models.Product, error)
 	AddClient(*models.Client) error
 	GetClientByID(int) (*models.Client, error)
+	GetClientByEmail(string) (*models.Client, error)
 }

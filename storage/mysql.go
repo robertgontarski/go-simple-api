@@ -115,3 +115,26 @@ func (s *MysqlStore) GetClientByID(id int) (*models.Client, error) {
 
 	return &client, nil
 }
+
+func (s *MysqlStore) GetClientByEmail(email string) (*models.Client, error) {
+	q := `SELECT * FROM client WHERE email = ?`
+
+	row := s.db.QueryRow(q, email)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	var client models.Client
+	if err := row.Scan(
+		&client.ID,
+		&client.Email,
+		&client.Password,
+		&client.Created,
+		&client.Updated,
+		&client.Deleted,
+	); err != nil {
+		return nil, err
+	}
+
+	return &client, nil
+}

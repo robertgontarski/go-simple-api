@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	"log/slog"
 	"os"
@@ -22,13 +21,10 @@ func main() {
 		return
 	}
 
-	validate := validator.New(validator.WithRequiredStructEnabled())
-
 	api := server.NewApiServer(
 		server.NewConfigServer(
 			os.Getenv("SERVER_LISTEN"),
 			store,
-			validate,
 		),
 	)
 
