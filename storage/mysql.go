@@ -30,13 +30,13 @@ func NewMysqlStore() (*MysqlStore, error) {
 	}, nil
 }
 
-func (s *MysqlStore) AddProduct(p *models.Product) error {
-	q := `insert into product (name, price) values (?, ?)`
+func (s *MysqlStore) AddProduct(product *models.Product) error {
+	q := `INSERT INTO product (name, price) VALUES (?, ?)`
 
 	result, err := s.db.Exec(
 		q,
-		p.Name,
-		p.Price,
+		product.Name,
+		product.Price,
 	)
 
 	if err != nil {
@@ -48,7 +48,7 @@ func (s *MysqlStore) AddProduct(p *models.Product) error {
 		return err
 	}
 
-	p.ID = id
+	product.ID = id
 
 	return nil
 }
@@ -74,4 +74,44 @@ func (s *MysqlStore) GetProductByID(id int) (*models.Product, error) {
 	}
 
 	return &product, nil
+}
+
+func (s *MysqlStore) AddClient(client *models.Client) error {
+	q := `INSERT INTO client (email, password) VALUES (?, ?)`
+
+	result, err := s.db.Exec(q, client.Email, client.Password)
+	if err != nil {
+		return err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	client.ID = id
+	return nil
+}
+
+func (s *MysqlStore) GetClientByID(id int) (*models.Client, error) {
+	q := `SELECT * FROM client WHERE id = ?`
+
+	row := s.db.QueryRow(q, id)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	var client models.Client
+	if err := row.Scan(
+		&client.ID,
+		&client.Email,
+		&client.Password,
+		&client.Created,
+		&client.Updated,
+		&client.Deleted,
+	); err != nil {
+		return nil, err
+	}
+
+	return &client, nil
 }

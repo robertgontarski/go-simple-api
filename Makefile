@@ -25,10 +25,10 @@ migration_create:
 	@migrate create -ext sql -dir $(MIGRATION_PATH) -seq $(name)
 
 migration_up:
-	@migrate -path mysql://$(MIGRATION_PATH)/ -database "$(MYSQL_DB_ADDR)" -verbose up
+	@migrate -path $(MIGRATION_PATH)/ -database "mysql://$(MYSQL_DB_ADDR)" -verbose up
 
 migration_down:
-	@migrate -path mysql://$(MIGRATION_PATH)/ -database "$(MYSQL_DB_ADDR)" -verbose down
+	@migrate -path $(MIGRATION_PATH)/ -database "mysql://$(MYSQL_DB_ADDR)" -verbose down
 
 migration_fix:
-	@migrate -path mysql://$(MIGRATION_PATH)/ -database "$(MYSQL_DB_ADDR)" force VERSION
+	@migrate -path $(MIGRATION_PATH)/ -database "mysql://$(MYSQL_DB_ADDR)" force VERSION

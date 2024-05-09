@@ -13,18 +13,18 @@ import (
 	"strconv"
 )
 
-type ProductHandler struct {
+type ClientHandler struct {
 	*DefaultHandler
 }
 
-func NewProductHandler(dh *DefaultHandler) *ProductHandler {
-	return &ProductHandler{
+func NewClientHandler(dh *DefaultHandler) *ClientHandler {
+	return &ClientHandler{
 		DefaultHandler: dh,
 	}
 }
 
-func (h *ProductHandler) CreateProductHandler(w http.ResponseWriter, r *http.Request) error {
-	var req types.CreateProductRequest
+func (h *ClientHandler) CreateClientHandler(w http.ResponseWriter, r *http.Request) error {
+	var req types.CreateClientRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return InvalidJSON()
 	}
@@ -39,21 +39,29 @@ func (h *ProductHandler) CreateProductHandler(w http.ResponseWriter, r *http.Req
 		return InvalidRequestData(errs)
 	}
 
-	product := models.NewProduct(req.Name, req.Price)
-	if err := h.db.AddProduct(product); err != nil {
+	client, err := models.NewClient(req.Email, req.Password)
+	if err != nil {
+		return writeJSON(w, http.StatusInternalServerError, &types.DefaultResponse{
+			Status: http.StatusInternalServerError,
+			Msg:    "error while encoding password",
+			Data:   nil,
+		})
+	}
+
+	if err := h.db.AddClient(client); err != nil {
 		return err
 	}
 
 	return writeJSON(w, http.StatusOK, &types.DefaultResponse{
 		Status: http.StatusOK,
-		Msg:    "product added",
+		Msg:    "client added",
 		Data: map[string]any{
-			"product_id": product.ID,
+			"client_id": client.ID,
 		},
 	})
 }
 
-func (h *ProductHandler) GetProductByIDHandler(w http.ResponseWriter, r *http.Request) error {
+func (h *ClientHandler) GetClientByIDHandler(w http.ResponseWriter, r *http.Request) error {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		return InvalidRequestData(map[string]string{
@@ -61,19 +69,19 @@ func (h *ProductHandler) GetProductByIDHandler(w http.ResponseWriter, r *http.Re
 		})
 	}
 
-	product, err := h.db.GetProductByID(id)
+	client, err := h.db.GetClientByID(id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return NewApiError(http.StatusNotFound, fmt.Errorf("product with id: %d, not found", id))
+			return NewApiError(http.StatusNotFound, fmt.Errorf("client with id: %d, not found", id))
 		}
 		return err
 	}
 
 	return writeJSON(w, http.StatusOK, &types.DefaultResponse{
 		Status: http.StatusOK,
-		Msg:    "return product",
+		Msg:    "return client",
 		Data: map[string]any{
-			"product": product,
+			"client": client,
 		},
 	})
 }

@@ -29,8 +29,15 @@ func (s *ApiServer) Listen() error {
 }
 
 func (s *ApiServer) setupRouter() {
-	productHandler := handler.NewProductHandler(s.Db, s.Validate)
+	dh := handler.NewDefaultHandler(s.Db, s.Validate)
+
+	productHandler := handler.NewProductHandler(dh)
 
 	s.router.HandleFunc("POST /product", handler.AsJSONContent(handler.MakeHandleFunc(productHandler.CreateProductHandler)))
 	s.router.HandleFunc("GET /product/{id}", handler.AsJSONContent(handler.MakeHandleFunc(productHandler.GetProductByIDHandler)))
+
+	clientHandler := handler.NewClientHandler(dh)
+
+	s.router.HandleFunc("POST /client", handler.AsJSONContent(handler.MakeHandleFunc(clientHandler.CreateClientHandler)))
+	s.router.HandleFunc("GET /client/{id}", handler.AsJSONContent(handler.MakeHandleFunc(clientHandler.GetClientByIDHandler)))
 }
